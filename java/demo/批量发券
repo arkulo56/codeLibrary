@@ -1,0 +1,42 @@
+@startuml
+
+title 手工批量更新一个批次使用码(项目一期用例)
+'1-----------------------------------------------------------------------------
+actor view
+activate createTicketCode接口
+
+view->createTicketCode接口:index_post(batchId)
+	group 验证该批次的有效性
+		createTicketCode接口->createTicketCode接口:getBatch(batchId,1,1)
+		note left createTicketCode接口:Array(batchObj,returnStartFlag,returnExpireFlag)
+		
+		alt batchObj->batch_lifecycle_type==3
+			createTicketCode接口-->view:return false
+		end
+		
+		alt returnStartFlag!='started' || returnExpireFlag!='noExpire'
+			createTicketCode接口-->view:return false
+		end
+	end
+
+'	group 生成使用码
+'		createTicketCode接口->createUseCodeRule使用码:createRuleNoPhone(batchObj)
+'		activate createUseCodeRule使用码
+'		createUseCodeRule使用码-->createTicketCode接口:return useCode
+'		deactivate createUseCodeRule使用码
+'	end
+	
+	group DAL_spGetTicket存储过程对一个批次券更新使用码
+		createTicketCode接口->DAL_spGetTicket存储过程: index_get(batchId,useCode)
+		activate DAL_spGetTicket存储过程
+		note left DAL_spGetTicket存储过程:批量将一个批次的购物券的使用码更新为useCode\n在存储过程中生成
+		DAL_spGetTicket存储过程-->createTicketCode接口:return true/false
+		deactivate DAL_spGetTicket存储过程
+	end
+createTicketCode接口->view:...
+
+
+deactivate createTicketCode接口
+
+'1-----------------------------------------------------------------------------
+@enduml

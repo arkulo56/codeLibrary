@@ -1,0 +1,13 @@
+package firstWeb;
+
+public class Student {
+	public void Student()
+	{
+		
+	}
+	
+	public void hw()
+	{
+		System.out.println("hello world");
+	}
+}

@@ -1,0 +1,34 @@
+@startuml
+
+title 发券资源和券绑定(SUC02)
+actor view
+view->setConsumeTicket:index_post(grantId,grantType,extractCode,useCodes)
+note left setConsumeTicket:useCodes包含被分配的多个券使用码
+	activate setConsumeTicket
+	
+
+		alt extractCode不为空,参数给的是一个提取码				
+				setConsumeTicket->setConsumeTicket:_batchIdSet(extractCode)
+				activate setConsumeTicket #DarkSalmon
+					setConsumeTicket->DAL:rest_client("ticket/电子券主表",array(ticket_extract_code==extractCode))
+					DAL-->setConsumeTicket:return ticketObjs/false	
+					loop ticketObjs as ticket
+						note right setConsumeTicket:$this->usecodes[] = ticket->ticket_use_code;\nreturn true/false
+					end					
+				deactivate setConsumeTicket
+		else 参数给的是一个券使用码的数组		
+			note right setConsumeTicket:$this->usecodes = useCodes
+		end
+		
+		group 事务批量更新合同绑定的券 
+			setConsumeTicket->tctSetGrant:index_post(grantId,grantType,useCodes)
+			activate tctSetGrant
+			note left tctSetGrant:事务逻辑：批量增加多个合同与券的关系记录，要么都成功，要么都不成功
+			tctSetGrant-->setConsumeTicket:return true/false
+			deactivate tctSetGrant
+		end
+		
+setConsumeTicket-->view:return true/false	
+deactivate setConsumeTicket
+
+@enduml

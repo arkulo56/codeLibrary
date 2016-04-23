@@ -1,0 +1,52 @@
+<%@page import="action.CourseItemAction"%>
+<%@page import="model.*"%>
+<%@page import="action.CourseAction"%>
+<%@page import="java.util.*"%>
+<%@page import="action.CourseSeriesAction"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>课程系列列表</title>
+</head>
+<body>
+<%
+CourseAction ca = new CourseAction();
+CourseSeriesAction csa = new CourseSeriesAction();
+CourseItemAction cia = new CourseItemAction();
+int courseId = Integer.parseInt(request.getParameter("courseId"));
+//查询课程数据
+List<Map> wh = new ArrayList();
+Map k = new HashMap();
+k.put("pre", "and");
+k.put("field", "id");
+k.put("relation","=");
+k.put("value",courseId);
+wh.add(k);
+List<Course> courseRes = ca.get(wh);
+//查询课程推荐系列
+List<Map> wh1 = new ArrayList();
+Map k1 = new HashMap();
+k1.put("pre", "and");
+k1.put("field", "classDate");
+k1.put("relation","=");
+k1.put("value",courseRes.get(0).getClassDate());
+wh.add(k1);
+List<CourseSeries> courseSeriesRes = csa.get(wh);
+for(int i=0;i<courseSeriesRes.size();i++)
+{
+	int seriesId = courseSeriesRes.get(i).getId();
+%>
+<hr>
+系列编号：
+<ul>
+<li></li>
+</ul>
+
+<%
+}
+%>
+</body>
+</html>

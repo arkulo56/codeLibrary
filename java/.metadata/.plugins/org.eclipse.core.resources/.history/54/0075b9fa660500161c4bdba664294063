@@ -1,0 +1,20 @@
+package model
+
+public class Student {
+	private int classLevel;
+	private int Level;
+	public int getClassLevel() {
+		return classLevel;
+	}
+	public void setClassLevel(int classLevel) {
+		this.classLevel = classLevel;
+	}
+	public int getLevel() {
+		return Level;
+	}
+	public void setLevel(int level) {
+		Level = level;
+	}
+	
+
+}

@@ -1,0 +1,26 @@
+package action;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import dao.CourseDao;
+import model.Course;
+
+public class CourseAction {
+	public List<Course> get(Course cr)
+	{
+		CourseDao hd = new CourseDao();	
+		List<Map<String,String>> wh = new ArrayList();
+		Map k = new HashMap();
+		k.put("pre", "and");
+		k.put("field", "startTime");
+		k.put("relation", "<");
+		k.put("value", new Date(cr.getEndTime().getTime()));
+		
+		
+		
+	}
+}

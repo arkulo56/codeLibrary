@@ -1,0 +1,42 @@
+@startuml
+title 收(发)券退货（退电子券）
+group 获取合同所发（收）电子券 
+view->goBackTicket:index_get(pactNumber,grantType)
+note left goBackTicket:result['grant'],\nresult['pay']={0=>useCode1,1=>useCode2,...}
+goBackTicket->goBackTicket:获取发券信息 \n goBackTicket->__grantUseCode(productConsumeId)
+goBackTicket->goBackTicket:获取收券信息 \n goBackTicket->__payUseCode(productConsumeId)
+goBackTicket-->view:return result/false
+end
+
+
+group 发券退券提交
+view->goBackTicket:index_post(pactNumber,grantType)
+	goBackTicket->DAL_tctBackTicket:index_put(pactNumber,grantType)
+	note over DAL_tctBackTicket
+		事务逻辑：
+		1、从发券绑定表中查出券使用码
+		2、循环未使用的券，更改状态为已作废
+		3、已使用的券不改变状态，人工会收回等额的现金
+	end note 
+	DAL_tctBackTicket-->goBackTicket:return true/false
+goBackTicket-->view:return true/false
+end
+
+group 用券退券提交
+view->goBackTicket:index_put(pactNumber,grantType)
+	goBackTicket->DAL_tctBackTicket:index_post(pactNumber,grantType)
+	note over DAL_tctBackTicket
+		事务逻辑：
+		1、从用券绑定表中查出券使用码
+		2、循环券使用码，更改状态为已发放
+		3、更新payTicketRecord表中所有用券状态为退款状态
+	end note 
+	DAL_tctBackTicket-->goBackTicket:return true/false
+
+
+goBackTicket-->view:....
+
+end
+
+
+@enduml 

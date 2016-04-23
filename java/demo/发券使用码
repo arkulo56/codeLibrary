@@ -1,0 +1,91 @@
+@startuml
+
+title 普通发券（SUC01,SUC02）
+'1-----------------------------------------------------------------------------
+actor view
+activate createTicketCode接口
+view->createTicketCode接口: index_get(batchIds,phone,returnType=0)
+note right of view
+	1.batchIds的结构是：
+		batchIds[batchId]=>accout 下标是批次编号，值是需要该批次券的数量
+	2.该接口可以返回extractCode提取码，也可直接返回券createUseCodeRule使用码
+		returnType等于0返回extractCode提取码
+end note
+'1-----------------------------------------------------------------------------
+'2----------------------------------------------------------------------------
+		group 验证多个批次的有效性
+			loop 遍历batchIds as batchId
+				createTicketCode接口->createTicketCode接口:getBatch(batchId,1,1)
+				note left createTicketCode接口:Array(batchObj,returnStartFlag,returnExpireFlag)
+				alt returnStartFlag!='started' || returnExpireFlag!='noExpire'
+					createTicketCode接口->view:return false
+				end
+				alt batchObj->batch_lifecycle_type==3
+					note over createTicketCode接口:查询顺延表，如果在有效发券截止日期内，\n则付值给数组batchExpireDate[batchObj->id] = 顺延多少天\n否则，向view返回false
+				end
+			end
+		end
+'2----------------------------------------------------------------------------		
+		group 通过事务获取多个批次的多张未用券
+		
+		createTicketCode接口->DAL_tctGetTicket_tctGetTicket事务接口: index_get(batchIds,batchExpireDate)
+		activate DAL_tctGetTicket_tctGetTicket事务接口
+			note left DAL_tctGetTicket_tctGetTicket事务接口
+				事务逻辑：
+				1. 循环batchIds获得每个批次需要的数量account，
+				   并查询数据库是否存在足够数量的可用券
+				2. 将上面获取到的电子券状态更新为已发放
+				3. 根据batchExpireDate记录了某些批次是顺眼有效期，还需要更新券有效期
+			end note		
+			alt 未用券数量<account
+				DAL_tctGetTicket_tctGetTicket事务接口-->createTicketCode接口: return false
+			else 
+				DAL_tctGetTicket_tctGetTicket事务接口-->createTicketCode接口: return ticketObjects
+			end
+		deactivate DAL_tctGetTicket_tctGetTicket事务接口
+		end
+'2----------------------------------------------------------------------------
+'3----------------------------------------------------------------------------
+		
+		group 获取extractCode提取码
+			createTicketCode接口->extractCode提取码: createRule(phone)
+			activate extractCode提取码
+			extractCode提取码-->createTicketCode接口:return extractCode
+		end	
+		deactivate extractCode提取码
+'3----------------------------------------------------------------------------
+'4----------------------------------------------------------------------------
+		group 获取每个电子券的使用码
+			loop 遍历ticketObjects as ticketObjectItem
+							
+					createTicketCode接口->createUseCodeRule使用码: createRule(phone,ticketObjectItem)
+					activate createUseCodeRule使用码	
+					createUseCodeRule使用码-->createTicketCode接口: Array tickets = return useCode
+					note left createUseCodeRule使用码:数组结构 ：\ntickets[ticketObjectItem->id] = useCode
+			end						
+			deactivate createUseCodeRule使用码
+		end
+'4----------------------------------------------------------------------------
+'5----------------------------------------------------------------------------
+			group 保存电子券的使用码和提取码
+				
+				createTicketCode接口->DAL_tctGetTicket_tctGetTicket事务接口:index_post(Array tickets,extractCode)
+				activate DAL_tctGetTicket_tctGetTicket事务接口
+				note left DAL_tctGetTicket_tctGetTicket事务接口
+					事务逻辑：
+					1.事务中循环修改每条记录的
+					  createUseCodeRule使用码和extractCode提取码
+				end note					
+				DAL_tctGetTicket_tctGetTicket事务接口-->createTicketCode接口:return true/false
+				deactivate DAL_tctGetTicket_tctGetTicket事务接口
+			end
+'5----------------------------------------------------------------------------
+
+	alt returnType==0
+		createTicketCode接口-->view: return return extractCode/false
+	else
+		createTicketCode接口-->view: return return tickets/false
+	end
+deactivate createTicketCode接口
+'1-----------------------------------------------------------------------------
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+
+title 微信提取码领券（SUC03,SUC07）
+actor weChat
+activate receiveTicket
+ 
+
+group 提取码对应的券	
+	weChat->receiveTicket: index_get(extractCode)
+	receiveTicket->DAL:rest_client("ticket/购物券接口", array(where ticket_extract_code=extractCode and ticket_status=2))
+	note left DAL:ticket_extract_code是提取码，ticket_status是券状态，2代表已发放
+	DAL-->receiveTicket:return ticketObjs/false
+
+	alt 获取券失败(上一步false)
+		receiveTicket-->weChat:return false
+		note left receiveTicket:没有查询到提取码，或者查询失败
+	end 
+end
+
+group 生成二维码图片
+	loop 遍历ticketObjs as ticketObj
+		receiveTicket->receiveTicket:createQT(titcketObj->ticket_use_code,expireDate,denomination):codeOTPath/false
+		note right receiveTicket: array paths[] = return codeOTPath
+	end
+end
+
+receiveTicket-->weChat:return paths/fasle
+
+deactivate receiveTicket
+@enduml

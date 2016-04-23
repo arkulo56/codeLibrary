@@ -1,0 +1,27 @@
+<%@page import="action.CourseAction"%>
+<%@page import="java.util.*"%>
+<%@page import="action.CourseSeriesAction"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>课程系列列表</title>
+</head>
+<body>
+<%
+CourseAction ca = new CourseAction();
+CourseSeriesAction csa = new CourseSeriesAction();
+int courseId = Integer.parseInt(request.getParameter("courseId"));
+List<Map> wh = new ArrayList();
+Map k = new HashMap();
+k.put("pre", "and");
+k.put("field", "id");
+k.put("relation","=");
+k.put("value",courseId);
+%>
+
+
+</body>
+</html>

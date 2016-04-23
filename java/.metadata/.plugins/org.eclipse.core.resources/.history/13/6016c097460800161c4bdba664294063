@@ -1,0 +1,35 @@
+package action;
+
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.SimpleFormatter;
+
+import dao.CourseDao;
+import model.Course;
+
+public class CourseItemAction {
+	
+	public int addCourse(Course cr) throws SQLException
+	{
+		//List<Course> getRes = this.get(cr);//查询冲突课程
+		//int addRes = insert(cr);//插入课程数据
+		
+		return 0;
+	}
+	
+	
+	//插入课程数据
+	private int insert(Course cr) throws SQLException
+	{
+		CourseDao hd = new CourseDao();		
+		return hd.add(cr);
+	}
+	
+
+}

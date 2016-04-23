@@ -1,0 +1,46 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import db.MysqlDrive;
+import model.CourseSeriesItem;
+
+public class SeriesDao {
+	private Connection con;
+	private Statement st;
+	//初始化
+	public SeriesDao()
+	{
+		con = MysqlDrive.getCon();
+		try
+		{
+			st = con.createStatement();
+		}catch(SQLException e)
+		{
+			System.out.println("statement初始化失败");
+		}
+	}
+	//添加
+	public int add(CourseSeries csi) throws SQLException
+	{
+		String sql = "insert into courseSeriesItem values(null,?,?,?,?)";
+		PreparedStatement pst = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+		pst.setString(1, csi.getClassDate());
+		pst.setInt(2, csi.getCourseId());
+		pst.setInt(3, csi.getSeriesId());
+		pst.setInt(4, csi.getSortCourse());
+		pst.executeUpdate();
+		
+		ResultSet res = pst.getGeneratedKeys();
+		if(res.next())
+		{
+			return res.getInt(1);
+		}
+		return 0;
+	}	
+	
+}

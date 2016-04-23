@@ -1,0 +1,9 @@
+package model;
+
+public class Student {
+	private int classLevel;
+	private int gradeLevel;
+
+
+	
+}

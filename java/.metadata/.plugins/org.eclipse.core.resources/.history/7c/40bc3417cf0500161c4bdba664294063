@@ -1,0 +1,21 @@
+package model;
+
+public class Student {
+	private int classLevel;
+	private int gradeLevel;
+	public int getClassLevel() {
+		return classLevel;
+	}
+	public void setClassLevel(int classLevel) {
+		this.classLevel = classLevel;
+	}
+	public int getGradeLevel() {
+		return gradeLevel;
+	}
+	public void setGradeLevel(int gradeLevel) {
+		this.gradeLevel = gradeLevel;
+	}
+
+
+	
+}

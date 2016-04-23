@@ -1,0 +1,11 @@
+package action;
+
+import model.CourseSeriesItem;
+
+public class CourseSeriesAction {
+	//插入数据
+	public boolean add(CourseSeriesItem csi)
+	{
+		
+	}
+}

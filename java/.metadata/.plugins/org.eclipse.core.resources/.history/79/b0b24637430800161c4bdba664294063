@@ -1,0 +1,15 @@
+package action;
+
+import java.sql.SQLException;
+
+import dao.SeriesDao;
+import model.CourseSeriesItem;
+
+public class CourseSeriesAction {
+	//插入数据
+	public int add(CourseSeriesItem csi) throws SQLException
+	{
+		SeriesDao hd = new SeriesDao();
+		return hd.add(csi);
+	}
+}

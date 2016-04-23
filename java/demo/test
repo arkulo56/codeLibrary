@@ -1,0 +1,27 @@
+@startuml
+
+'需求：1、满多少？ 2、用几张？(累加就是1) 3、是否累加
+
+
+view->函数:sv券对象
+note over view,函数
+这是全局变量
+$surplusValue 实际未支付额度
+$limtValue 满多少剩余限额
+$activityCodes[活动编号]=几张   已用券的活动编号数组
+end note
+alt sv->conditionValue < $limitValue
+	函数-->view:return 1 //额度不够
+end
+alt isset($activityCodes[$sv->activityCode])
+	
+	alt $sv->activityNumber <= $activityCodes['activityCode']
+		alt $sv->conditionType==0
+			函数-->view:return 2 //超出用券数量限制
+		end
+	end
+end
+函数-->view:return 0 //可以用券
+
+
+@enduml

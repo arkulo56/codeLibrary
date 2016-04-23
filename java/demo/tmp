@@ -1,0 +1,66 @@
+@startuml
+
+title 电子券排斥
+
+note over view
+全局变量:
+useCodeSign = 0 表示当前已经用券数量
+activityCodes = array() 表示已经收了券的批次编号
+payAmount = 订单应付额
+end note
+
+
+
+
+view->排它函数:入参是对象UC
+
+alt UC->condiTionType == 3
+	排它函数->judgeRepeatRule:重叠发券规则，入参是对象UC
+else
+	排它函数->judgeRule:其他发券规则，入参是对象UC
+end
+
+group 重叠发券
+	
+	alt useCodeSign > floor(payAmount / UC->conditionValue)  发券额度是否达到
+		judgeRepeatRule-->排它函数:false
+	end
+	
+	alt useCodeSign==0 是否为第一张
+		judgeRepeatRule-->排它函数:true
+	else
+		loop 遍历activityCodes as ac
+			alt ac!=UC->批次编号（与以往批次不相同） 
+				judgeRepeatRule-->排它函数:false
+			end
+		end
+		judgeRepeatRule-->排它函数:true
+	end
+end
+
+group 其他发券规则
+
+	alt useCodeSign==0
+		alt UC->conditionType==1 一张合同用一张
+			judgeRule-->排它函数:true
+		end
+		alt UC->conditionType==2 满多少一张合同用一张
+			alt UC->conditionValue < payAmount  发券额度是否达到
+				judgeRule-->排它函数:true
+			else
+				judgeRule-->排它函数:false
+			end		
+		end
+	else
+		alt UC->conditionType==1 or 2
+			judgeRule-->排它函数:false
+		end
+	end
+	judgeRule-->排它函数:return true
+
+end
+
+
+排它函数-->view:return true/false
+
+@enduml

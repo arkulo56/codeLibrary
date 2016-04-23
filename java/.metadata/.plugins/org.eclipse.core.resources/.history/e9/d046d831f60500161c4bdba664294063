@@ -1,0 +1,33 @@
+package dao;
+
+import model.Student;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+
+import db.MysqlDrive;
+
+public class StudentDao {
+	private Connection con;
+	private Statement st;
+	
+	public StudentDao()
+	{
+		con = MysqlDrive.getCon();
+		try
+		{
+			st = con.createStatement();
+		}catch(SQLException e)
+		{
+			System.out.println("数据库初始化失败");
+		}
+	}
+	
+	public List<Student> get(List<Map<String,String>> wh)
+	{
+		
+		
+	}
+}

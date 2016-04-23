@@ -1,0 +1,47 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.Map;
+
+import db.MysqlDrive;
+import model.Course;
+
+public class CourseDao {
+	private Connection con;
+	private Statement st;
+	
+	public CourseDao()
+	{
+		con = MysqlDrive.getCon();
+		try
+		{
+			st = con.createStatement();
+		}catch(SQLException e)
+		{
+			System.out.println("statement初始化失败");
+		}
+	}
+	
+	public List<Course> get(List<Map<String,String>> wh)
+	{
+		String sql = "select * from course where 1=1";
+		for(int i=0;i<wh.size();i++)
+		{
+			sql = sql+" "+wh.get(i).get("pre")+" "+wh.get(i).get("field")+wh.get(i).get("relation")+wh.get(i).get("value");
+		}
+	}
+	
+//	public int add(Course nc)
+//	{
+//		
+//	}
+//	
+//	public boolean del(int id)
+//	{
+//		
+//	}
+//	
+}

@@ -1,0 +1,14 @@
+@startuml
+title 手机获取电子券列表(SUC05)
+actor view
+
+view->geticketByPhone:index_get(phone)
+	activate geticketByPhone
+	geticketByPhone->DAL:rest_client("ticket/购物券接口", array(where ticket_send_object=phone))
+	activate DAL
+	DAL-->geticketByPhone:return ticketObjs/false
+	deactivate DAL
+geticketByPhone-->view:return ticketObjs/false
+deactivate geticketByPhone
+
+@enduml

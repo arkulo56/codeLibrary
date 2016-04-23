@@ -1,0 +1,23 @@
+package firstWeb.firstWeb;
+
+public class Student {
+	private int id;
+	
+	public void Student()
+	{
+		
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void hw()
+	{
+		System.out.println("hello world");
+	}
+}

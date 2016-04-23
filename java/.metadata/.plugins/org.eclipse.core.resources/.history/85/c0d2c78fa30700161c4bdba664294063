@@ -1,0 +1,9 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    
+<jsp:useBean id="newCourse" class="model.Course" scope="page" />
+<<jsp:setProperty property="*" name="newCourse"/>
+
+<%
+out.println(newCourse.getName());
+%>

@@ -1,0 +1,118 @@
+package action;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import dao.CourseDao;
+import model.Course;
+import model.CourseSeries;
+import model.CourseSeriesItem;
+
+public class CourseAction {
+	
+	public boolean addNewCourse(Course cr) throws SQLException
+	{
+		//初始化action
+		CourseSeriesAction csa = new CourseSeriesAction();
+		CourseItemAction cia = new CourseItemAction();
+		
+		//读取冲突的课程
+		List<Course> cst = this.get(cr);
+		List<Integer> xx = new ArrayList();
+		for(int i=0;i<cst.size();i++)
+		{
+			xx.add(cst.get(i).getId());
+		}		
+		List<CourseSeriesItem> cs = cia.getCommon(cr, xx);
+		
+		//插入课程数据
+		int courseId = this.addCourse(cr);
+		cr.setId(courseId);
+		
+		//读取附表可以组合的系列
+		List<Integer> ni = new ArrayList();
+		for(int i=0;i<cs.size();i++)
+		{
+			ni.add(cs.get(i).getSeriesId());
+		}
+		List<CourseSeriesItem> csiRes = cia.get(cr, ni);
+		
+		
+		int step = -1;
+		do
+		{
+
+		
+			step++;
+		}while(step<csiRes.size());
+
+		
+		return true;
+	}
+	private void _setSeries(Course cr) throws SQLException
+	{
+		//初始化action
+		CourseSeriesAction csa = new CourseSeriesAction();
+		CourseItemAction cia = new CourseItemAction();	
+		//添加单独的一个系列主表
+		CourseSeries newCsa = new CourseSeries();	
+		newCsa.setClassDate(cr.getClassDate());
+		int courseSeriesId = csa.addSeries(newCsa);
+	}
+	private void _setItem(String dt,int courseId,int courseSeriesId) throws SQLException
+	{
+		CourseItemAction cia = new CourseItemAction();
+			
+		//添加单独的一个系列附表
+		CourseSeriesItem csi = new CourseSeriesItem();
+		csi.setClassDate(dt);
+		csi.setCourseId(courseId);
+		csi.setSeriesId(courseSeriesId);
+		csi.setSortCourse(0);
+		cia.addItem(csi);
+	}
+	
+	
+	
+	//插入主表数据
+	public int addCourse(Course cr) throws SQLException
+	{
+		CourseDao hd = new CourseDao();		
+		return hd.add(cr);
+	}	
+	
+	//查询冲突课程
+	private List<Course> get(Course cr) throws SQLException
+	{		
+		CourseDao hd = new CourseDao();	
+		List<Map> wh = new ArrayList();
+		//开始时间小于当前课程结束时间
+		Map k = new HashMap();
+		k.put("pre", "and");
+		k.put("field", "startTime");
+		k.put("relation", "<");
+		k.put("value", "'"+cr.getEndTime()+"'");
+		wh.add(k);
+		//结束时间大于当前课程开始时间
+		Map e = new HashMap();
+		e.put("pre", "and");
+		e.put("field", "endTime");
+		e.put("relation", ">");
+		e.put("value", "'"+cr.getStartTime()+"'");
+		wh.add(e);
+		//开课日期相等
+		Map ed = new HashMap();
+		ed.put("pre", "and");
+		ed.put("field", "classDate");
+		ed.put("relation", "=");
+		ed.put("value", "'"+cr.getClassDate()+"'");
+		wh.add(ed);
+		
+		return hd.get(wh);		
+	}
+	
+
+}

@@ -1,0 +1,22 @@
+package action;
+
+import java.sql.SQLException;
+
+import dao.SeriesDao;
+import dao.SeriesItemDao;
+import model.CourseSeries;
+import model.CourseSeriesItem;
+
+public class CourseSeriesAction {
+	//插入数据
+	public int add(CourseSeriesItem csi) throws SQLException
+	{
+		//主表和附表一起插入数据
+		SeriesDao shd = new SeriesDao();		
+		CourseSeries cs = new CourseSeries();		
+		SeriesItemDao hd = new SeriesItemDao();
+		cs.setClassDate(csi.getClassDate());
+		int seriesId = shd.add(cs);
+
+	}
+}

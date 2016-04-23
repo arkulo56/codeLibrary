@@ -1,0 +1,73 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import db.MysqlDrive;
+import model.Course;
+
+public class CourseDao {
+	private Connection con;
+	private Statement st;
+	
+	public CourseDao()
+	{
+		con = MysqlDrive.getCon();
+		try
+		{
+			st = con.createStatement();
+		}catch(SQLException e)
+		{
+			System.out.println("statement初始化失败");
+		}
+	}
+	
+	public List<Course> get(List<Map> wh) throws SQLException
+	{
+		String sql = "select * from course where 1=1";
+		for(int i=0;i<wh.size();i++)
+		{
+			sql = sql+" "+wh.get(i).get("pre")+" "+wh.get(i).get("field")+wh.get(i).get("relation")+wh.get(i).get("value");
+		}
+		
+		System.out.println(sql);
+		ResultSet res = st.executeQuery(sql);
+		List<Course> r = new ArrayList();
+		while(res.next())
+		{
+			Course n = new Course();
+			n.setId(res.getInt("id"));
+			n.setName(res.getNString("name"));
+			n.setClassDate(res.getDate("classDate"));
+			n.setStartTime(res.getDate("startTime"));
+			n.setEndTime(res.getDate("endTime"));
+			n.setTeacher(res.getString("teacher"));
+			n.setClassNumber(res.getInt("classNumber"));
+			n.setStudentNumber(res.getInt("studentNumber"));
+			n.setPrice(res.getFloat("price"));
+			n.setStatus(res.getInt("status"));
+			n.setSeason(res.getString("season"));
+			n.setClassLevel(res.getInt("classLevel"));
+			n.setClassCategory(res.getInt("classcategory"));
+			
+			r.add(n);
+		}
+		return r;
+	}
+	
+//	public int add(Course nc)
+//	{
+//		
+//	}
+//	
+//	public boolean del(int id)
+//	{
+//		
+//	}
+//	
+}

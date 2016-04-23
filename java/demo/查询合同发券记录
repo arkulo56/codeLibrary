@@ -1,0 +1,22 @@
+@startuml
+title 通过合同号查询发放的购物券(SUC05)
+actor view
+
+view->setConsumeTicket:index_get(grantId,grantType)
+
+	group 读取合同发券记录表
+		setConsumeTicket->DAL:rest_client("ticket/合同发券记录表接口", array(where grantType==‘product_conume’ && grantId==合同主键))
+		
+		DAL-->setConsumeTicket:return ticketIds/false
+	end
+	
+	group 获取所有购物券信息
+		setConsumeTicket->DAL:rest_client("ticket/购物券接口", array(where id in ticketIds))
+		
+		DAL-->setConsumeTicket:return ticketObjs/false
+	end
+	
+setConsumeTicket-->view:ticketObjs/false
+
+
+@enduml

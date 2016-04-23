@@ -1,0 +1,84 @@
+@startuml
+title 使用电子券付款（三期SUC01，SUC02）
+
+
+group 页面ajax获取券信息,bll做各种验证
+	view->useTicket:index_get(useCode,merchantKcode,phone=NULL)
+	note right view:使用码，商户k代码，电话
+
+	'------------------------------------------------------
+	group 通过useCode获取券主表信息 
+		useTicket->DAL:通过DAL接口获取对应电子券主表信息
+		DAL-->useTicket:return ticketObj/false
+	end
+	
+	group 通过useCode获取券主表信息 
+		useTicket->DAL:通过DAL接口获取批次信息
+		DAL-->useTicket:return ticketBatchObj/false
+	end	
+	'------------------------------------------------------
+	group 判断黑白名单 
+		useTicket->DAL:通过DAL获取该商户的K代码是否是黑名单
+		DAL-->useTicket:return 黑名单/false
+		alt 是黑名单商户
+			useTicket-->view:return false
+		end
+	end
+	'------------------------------------------------------
+	group 判断有效期
+		useTicket->DAL:通过DAL获取电子券的有效期
+		DAL-->useTicket:return 有效期s/false
+		alt 当前日期不在 ticketObj->有效期 内
+			useTicket->DAL:如果过期，通过DAL更新券状态为过期
+			useTicket-->view:return false
+		end	
+	end	
+	'------------------------------------------------------
+	group 判断手机号是否对应
+		alt 券信息->ticket_send_object != phone && 批次信息->astrictRule==1
+			useTicket-->view:return false
+		end	
+	end
+	'------------------------------------------------------
+	group 判断用券限制在view层实现
+		note over view,useTicket
+			券信息->conditionType:0没有限制 1一张合同限用一张 2满多少限用一张 3每满多少可以用一张
+			券信息->conditionValue:满多少的值
+			不同批次之间是否可以混用？
+		end note
+	
+	end
+	'------------------------------------------------------
+	
+	useTicket-->view:return array('ticket'=>券信息,'batch'=>批次信息)/false
+	
+end
+'------------------------------------------------------------------------------------
+group 表单提交处理
+
+	group 商城处理部分
+		note over useTicket
+			1、商城和收银台都没有使用三层结构生成订单
+			2、生成订单由原生代码实现
+			3、下面的部分是通过接口更新电子券
+		end note
+	end
+	group 三层接口完成部分
+		view->useTicket:index_put(useCodes,pactNumber)
+
+				useTicket->DAL_tctChangeTicketState:index_put(useCodes,pactNumber,grantType)
+				note over DAL_tctChangeTicketState
+					事务逻辑：
+					0、循环多张券
+						1、先查询一下状态，确定是已发放，未使用
+						2、更新状态为已使用
+						3、写表payTicketRecord(合同收券明细表)
+				end note
+				return true/false
+
+		useTicket-->view:return true/false
+	end
+end
+
+
+@enduml
