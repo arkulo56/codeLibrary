@@ -20,19 +20,20 @@ public class CourseAction {
 		CourseItemAction cia = new CourseItemAction();
 		
 		//读取冲突的课程
-		List<Course> cst = this.get(cr);
+		List<Course> cst = this.get(cr);//这里是读取冲突课程
 		List<Integer> xx = new ArrayList();
 		for(int i=0;i<cst.size();i++)
 		{
 			xx.add(cst.get(i).getId());
 		}		
-		List<CourseSeriesItem> cs = cia.getCommon(cr, xx);//返回那些不能组合的seriesId
+		List<CourseSeriesItem> cs = cia.getCommon(cr, xx);//读取系列附表，返回那些不能组合的seriesId
 		
 		//插入课程数据
 		int courseId = this.addCourse(cr);
 		cr.setId(courseId);
 		
-		//读取主表可以组合的系列		
+		//读取主表可以组合的系列
+		//把附表中读取到的系列编号(不能组合的)在这里做not in条件
 		String ni = "(0";
 		for(int i=0;i<cs.size();i++)
 		{

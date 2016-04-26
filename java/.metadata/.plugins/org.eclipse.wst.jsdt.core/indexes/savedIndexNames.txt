@@ -1,5 +1,0 @@
-INDEX VERSION 1.3+/Users/arkulo/Documents/project/java/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
-3118052708.index
-3118052708.index
-217859610.index
-2112577387.index

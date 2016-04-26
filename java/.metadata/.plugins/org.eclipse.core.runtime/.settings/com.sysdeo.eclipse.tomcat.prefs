@@ -1,7 +1,0 @@
-computeSourcePath=true
-configMode=contextFiles
-contextsDir=/Users/arkulo/Applications/apache-tomcat-8.0.33/conf/Catalina/localhost
-eclipse.preferences.version=1
-tomcatConfigFile=/Users/arkulo/Applications/apache-tomcat-8.0.33/conf/server.xml
-tomcatDir=/Users/arkulo/Applications/apache-tomcat-8.0.33
-tomcatVersion=tomcatV7

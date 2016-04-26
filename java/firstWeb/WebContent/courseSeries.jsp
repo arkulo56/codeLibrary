@@ -70,6 +70,7 @@ for(int i=0;i<courseSeriesRes.size();i++)
 	List<CourseSeriesItem> resItem = cia.getCommon(whItem);
 	int sign = 0;
 	String ot = "<ul>";
+	float sumAccount = 0;
 	for(int j=0;j<resItem.size();j++)
 	{
 		//课程系列详情（课程详情）
@@ -92,12 +93,15 @@ for(int i=0;i<courseSeriesRes.size();i++)
 		}
 		
 		ot += li+r.getId()+" / "+r.getName()+" / "+startTime[1]+" / "+endTime[1]+" / ¥"+r.getPrice()+"</li>";
+		
+		//计算总价	
+		sumAccount=sumAccount+r.getPrice();
 
 	}
 	ot += "</ul>";
 	if(sign==1)
 	{
-		out.println("课程系列编号："+seriesId);
+		out.println("课程总价:  ¥"+sumAccount);
 		out.println(ot);
 		out.println("<hr>");
 	}
